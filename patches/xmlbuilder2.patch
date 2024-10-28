@@ -1,0 +1,15 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+deleted file mode 100644
+index a819625e977781f4f407c15a9323d8c330f3dc12..0000000000000000000000000000000000000000
+diff --git a/package.json b/package.json
+index 5eeb3b9cb1b6f5a70c3f341685e44db6acd556b1..550e9a98519b4089a6ba3674d01561717abf7de8 100644
+--- a/package.json
++++ b/package.json
+@@ -18,7 +18,6 @@
+     "url": "http://github.com/oozcitak/xmlbuilder2/issues"
+   },
+   "main": "./lib/index",
+-  "browser": "./lib/xmlbuilder2.min.js",
+   "engines": {
+     "node": ">=12.0"
+   },

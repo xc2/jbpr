@@ -1,0 +1,33 @@
+{
+  "name": "jbp-proxy",
+  "scripts": {
+    "prepare": "pnpm --package husky@9.1.1 dlx husky",
+    "wrangler": "pnpm --package wrangler@3.83.0 dlx wrangler",
+    "dev": "pnpm wrangler dev",
+    "deploy": "pnpm wrangler deploy --minify"
+  },
+  "dependencies": {
+    "@types/bun": "^1.1.12",
+    "@types/deno": "^2.0.0",
+    "@types/lodash-es": "^4.17.12",
+    "@types/semver": "^7.5.8",
+    "@zip.js/zip.js": "^2.7.52",
+    "hono": "^4.6.7",
+    "lodash-es": "^4.17.21",
+    "semver": "^7.6.3",
+    "xmlbuilder2": "^3.1.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@cloudflare/workers-types": "^4.20241022.0"
+  },
+  "nano-staged": {
+    "*.{js,ts,jsx,tsx,css,scss,mjs,cjs,mts,cts}": "biome check --write --diagnostic-level=error --no-errors-on-unmatched"
+  },
+  "packageManager": "pnpm@9.12.1+sha512.e5a7e52a4183a02d5931057f7a0dbff9d5e9ce3161e33fa68ae392125b79282a8a8a470a51dfc8a0ed86221442eb2fb57019b0990ed24fab519bf0e1bc5ccfc4",
+  "pnpm": {
+    "patchedDependencies": {
+      "xmlbuilder2": "patches/xmlbuilder2.patch"
+    }
+  }
+}
