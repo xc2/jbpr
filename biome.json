@@ -49,11 +49,13 @@
       },
       "complexity": {
         "noForEach": "warn",
-        "noUselessSwitchCase": "off"
+        "noUselessSwitchCase": "off",
+        "noBannedTypes": "off"
       },
       "suspicious": {
         "noExplicitAny": "warn",
-        "noArrayIndexKey": "warn"
+        "noArrayIndexKey": "warn",
+        "noEmptyInterface": "off"
       }
     }
   }
