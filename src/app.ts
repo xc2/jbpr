@@ -24,6 +24,7 @@ app.get("/plugin/list", async (c) => {
     const [valid, targetVersion] = mutateAndIsVersionMatch(first, buildVersion);
     const uu = new URL(u);
     uu.searchParams.set("build", `${product}-${targetVersion}`);
+    // fetching with `build` parameter seems different from fetching without it, so we fetch again
     [first, root] = await fetchAndGetFirstPlugin(uu);
     if (first) {
       mutateAndIsVersionMatch(first, buildVersion);
@@ -76,8 +77,7 @@ app.get("/plugin/download", async (c) => {
       return getZipTransformStream((entry) => {
         if (entry.filename === "META-INF/plugin.xml") {
           return unstreamText((text) => {
-            // text = text.replace(/ since-build="[^"]+"/, "");
-            text = text.replace(/ until-build="[^"]+"/, ' until-build="243.*"');
+            text = text.replace(/ until-build="[^"]+"/, "");
             return text;
           });
         }
@@ -89,8 +89,6 @@ app.get("/plugin/download", async (c) => {
   const fin = new Response(es.readable, { headers: h });
   try {
     c.executionCtx.waitUntil(r);
-  } catch {
-    await r;
-  }
+  } catch {}
   return fin;
 });

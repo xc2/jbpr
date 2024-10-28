@@ -2,8 +2,10 @@ import {
   type Entry,
   type EntryGetDataOptions,
   ZipReader,
+  type ZipReaderConstructorOptions,
   ZipWriter,
   type ZipWriterAddDataOptions,
+  type ZipWriterConstructorOptions,
   configure,
 } from "@zip.js/zip.js";
 import { pick } from "lodash-es";
@@ -13,24 +15,44 @@ configure({
 });
 
 export function getZipTransformStream(
-  getTransformer?: (
-    entry: Entry
+  getTransformer?: (entry: Entry) =>
+    | (Partial<ReadableWritablePair> & {
+        read?: EntryGetDataOptions;
+        write?: ZipWriterAddDataOptions | ((entry: Entry) => ZipWriterAddDataOptions);
+      })
+    | undefined
+    | null
     // biome-ignore lint: a
-  ) => ReadableWritablePair | undefined | null | void
+    | void,
+  options?: {
+    reader?: ZipReaderConstructorOptions;
+    writer?: ZipWriterConstructorOptions;
+  }
 ): ReadableWritablePair {
   const sourceStream = new TransformStream();
   const zipFileStream = passThrough({
     async startRead(controller) {
       try {
         for await (const entry of reader.getEntriesGenerator()) {
-          const transformer = getTransformer?.(entry);
+          const { read, write, readable, writable } = getTransformer?.(entry) || {};
 
-          if (transformer) {
-            const r = readEntry(entry).pipeThrough(transformer);
-            const out = await writer.add(entry.filename, r, mapEntryToAddFileOptions(entry, false));
+          if (readable && writable) {
+            const r = readEntry(entry, { passThrough: false, ...read }).pipeThrough({
+              readable,
+              writable,
+            });
+            await writer.add(
+              entry.filename,
+              r,
+              getAddFileOptions(entry, { passThrough: false }, write)
+            );
           } else {
-            const r = readEntry(entry, { passThrough: true });
-            await writer.add(entry.filename, r, mapEntryToAddFileOptions(entry, true));
+            const r = readEntry(entry, { passThrough: true, ...read });
+            await writer.add(
+              entry.filename,
+              r,
+              getAddFileOptions(entry, { passThrough: true }, write)
+            );
           }
         }
         await writer.close();
@@ -40,11 +62,8 @@ export function getZipTransformStream(
       }
     },
   });
-  const reader = new ZipReader(sourceStream.readable, {});
-  const writer = new ZipWriter(zipFileStream.writable, {
-    keepOrder: true,
-    level: 9,
-  });
+  const reader = new ZipReader(sourceStream.readable, options?.reader);
+  const writer = new ZipWriter(zipFileStream.writable, options?.writer);
 
   return {
     readable: zipFileStream.readable,
@@ -65,7 +84,12 @@ export function readEntry(entry: Entry, options?: EntryGetDataOptions): Readable
   return r.readable;
 }
 
-export function mapEntryToAddFileOptions(entry: Entry, passTrough: boolean = false) {
+export function getAddFileOptions(
+  entry: Entry,
+  defaults?: ZipWriterAddDataOptions,
+  userOptions?: ZipWriterAddDataOptions | ((entry: Entry) => ZipWriterAddDataOptions)
+) {
+  const user = typeof userOptions === "function" ? userOptions(entry) : userOptions;
   const keys: (keyof Entry & keyof ZipWriterAddDataOptions)[] = [
     "directory",
     "comment",
@@ -83,21 +107,27 @@ export function mapEntryToAddFileOptions(entry: Entry, passTrough: boolean = fal
     "compressionMethod",
     "msDosCompatible",
   ];
-  if (passTrough) {
-    keys.push("uncompressedSize", "signature");
-  }
-  const options: Partial<ZipWriterAddDataOptions> = pick(entry, keys);
-  if (entry.extraField) {
+  const options: Partial<ZipWriterAddDataOptions> = { ...pick(entry, keys), ...defaults, ...user };
+  if (entry.extraField && !options.extraField) {
     // entry.extraField is actually a Map<string, {type, data}>
     options.extraField = new Map(
       Array.from(entry.extraField.entries()).map(([k, v]) => [k, (v as any)?.data || v])
     );
   }
-  if (passTrough) {
-    options.passThrough = true;
+  if (options.passThrough) {
+    if (!options.uncompressedSize) {
+      options.uncompressedSize = entry.uncompressedSize;
+    }
+    if (!options.signature) {
+      options.signature = entry.signature;
+    }
   } else {
+    // passThrough makes zip64 default to true, which might cause broken zip
+    // so we force it to false when it is not explicitly set to true
+    if (options.zip64 !== true) {
+      options.zip64 = false;
+    }
   }
-  options.level = 9;
 
   return options;
 }

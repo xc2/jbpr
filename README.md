@@ -2,4 +2,4 @@ This is a WIP Jetbrains Plugin Repository proxy to remove plugin version constra
 
 ## TODO
 
-- [ ] fix: Jetbrains reports invalid plugin descriptor for re-compressed `META-INF/plugin.xml` file
+- [ ] user entry
