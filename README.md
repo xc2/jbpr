@@ -2,4 +2,4 @@ This is a WIP Jetbrains Plugin Repository proxy to remove plugin version constra
 
 ## TODO
 
-- [ ] user entry
+- [ ] docs: user entry

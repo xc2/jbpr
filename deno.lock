@@ -1,0 +1,29 @@
+{
+  "version": "4",
+  "specifiers": {
+    "jsr:@std/cli@*": "1.0.6"
+  },
+  "jsr": {
+    "@std/cli@1.0.6": {
+      "integrity": "d22d8b38c66c666d7ad1f2a66c5b122da1704f985d3c47f01129f05abb6c5d3d"
+    }
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@biomejs/biome@^1.9.4",
+        "npm:@cloudflare/workers-types@^4.20241022.0",
+        "npm:@jsr/std__cli@^1.0.6",
+        "npm:@types/bun@^1.1.12",
+        "npm:@types/deno@2",
+        "npm:@types/lodash-es@^4.17.12",
+        "npm:@types/semver@^7.5.8",
+        "npm:@zip.js/zip.js@^2.7.52",
+        "npm:hono@^4.6.7",
+        "npm:lodash-es@^4.17.21",
+        "npm:semver@^7.6.3",
+        "npm:xmlbuilder2@^3.1.1"
+      ]
+    }
+  }
+}

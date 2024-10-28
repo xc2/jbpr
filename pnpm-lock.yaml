@@ -13,6 +13,9 @@ importers:
 
   .:
     dependencies:
+      '@std/cli':
+        specifier: npm:@jsr/std__cli@^1.0.6
+        version: '@jsr/std__cli@1.0.6'
       '@types/bun':
         specifier: ^1.1.12
         version: 1.1.12
@@ -105,6 +108,9 @@ packages:
 
   '@cloudflare/workers-types@4.20241022.0':
     resolution: {integrity: sha512-1zOAw5QIDKItzGatzCrEpfLOB1AuMTwVqKmbw9B9eBfCUGRFNfJYMrJxIwcse9EmKahsQt2GruqU00pY/GyXgg==}
+
+  '@jsr/std__cli@1.0.6':
+    resolution: {integrity: sha512-aWfDn9Hsr8wGI1D0nX4o1ADCt93gerYy3bU7zXrlymxD1HXTWj3EfgOq2/cKmpcTmR/PWBensX4AnenprWb9cA==, tarball: https://npm.jsr.io/~/11/@jsr/std__cli/1.0.6.tgz}
 
   '@oozcitak/dom@1.15.10':
     resolution: {integrity: sha512-0JT29/LaxVgRcGKvHmSrUTEvZ8BXvZhGl2LASRUgHqDTC1M5g1pLmVv56IYNyt3bG2CUjDkc67wnyZC14pbQrQ==}
@@ -222,6 +228,8 @@ snapshots:
     optional: true
 
   '@cloudflare/workers-types@4.20241022.0': {}
+
+  '@jsr/std__cli@1.0.6': {}
 
   '@oozcitak/dom@1.15.10':
     dependencies:

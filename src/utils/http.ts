@@ -5,3 +5,11 @@ export function copyHeader(source: Headers, dest: Headers, name: string, default
     dest.set(name, defaults);
   }
 }
+
+export function copyResponse(body: BodyInit | null, res: Response) {
+  return new Response(body, {
+    status: res.status,
+    statusText: res.statusText,
+    headers: res.headers,
+  });
+}

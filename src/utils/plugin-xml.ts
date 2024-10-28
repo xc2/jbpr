@@ -1,6 +1,8 @@
 import S from "semver";
 import { create } from "xmlbuilder2";
 import type { XMLBuilder } from "xmlbuilder2/lib/interfaces";
+import { copyResponse } from "./http";
+import { getPluginListUrl } from "./jetbrains";
 
 export function exactLatest(doc: XMLBuilder): XMLBuilder | undefined {
   const [plugin] =
@@ -14,16 +16,16 @@ function text(node: XMLBuilder, name: string) {
   return child(node, name)?.node?.textContent;
 }
 
-export function mutateAndIsVersionMatch(
+export function removeVersionConstraintsIfNecessary(
   pluginNode: XMLBuilder,
   version: string
 ): [boolean, string] {
   if (!version) {
-    return [true, ""];
+    return [false, version];
   }
   const verNode = child(pluginNode, "idea-version");
   if (!verNode) {
-    return [true, version];
+    return [false, version];
   }
   const node = verNode.node as unknown as Element;
   const sv = S.coerce(version, { loose: true })?.version ?? version;
@@ -32,41 +34,56 @@ export function mutateAndIsVersionMatch(
   const until = node.getAttribute("until-build");
   if (since && S.outside(sv, new S.Range(since, { loose: true }), "<")) {
     verNode.removeAtt("since-build");
-    return [false, since];
+    return [true, since];
   }
   if (until && S.outside(sv, new S.Range(until, { loose: true }), ">")) {
     verNode.removeAtt("until-build");
-    return [false, until];
+    return [true, until];
   }
-  return [true, version];
+  return [false, version];
 }
 
-export function setDownloadUrl(
-  pluginNode: XMLBuilder,
-  base: string | URL = "https://plugins.jetbrains.com",
-  channel = "stable"
-) {
-  const id = text(pluginNode, "id");
-  const version = text(pluginNode, "version");
-  const uu = new URL("/plugin/download", base);
-  if (id) {
-    uu.searchParams.set("pluginId", id);
-  }
-  if (version) {
-    uu.searchParams.set("version", version);
-  }
-  if (channel) {
-    uu.searchParams.set("channel", channel);
-  }
-  const url = uu.href;
+export function getPluginMeta(pluginNode: XMLBuilder) {
+  return {
+    pluginXmlId: text(pluginNode, "id"),
+    version: text(pluginNode, "version"),
+  };
+}
+
+export function setDownloadUrl(pluginNode: XMLBuilder, url: URL) {
   const ele = child(pluginNode, "download-url") || pluginNode.ele("download-url");
-  ele.txt(url);
-  return [url, ele] as const;
+  ele.txt(url.href);
+  return ele;
 }
 
-export async function fetchAndGetFirstPlugin(url: string | URL) {
+async function _fetchAndGetFirstPlugin(url: URL) {
   const res = await fetch(url);
   const raw = await res.text();
+
   const doc = create(raw);
-  return [exactLatest(doc), doc] as const;
+  const first = exactLatest(doc);
+  if (!first) {
+    throw copyResponse(raw, res);
+  }
+  const meta = getPluginMeta(first);
+  if (!meta.pluginXmlId || !meta.version) {
+    throw copyResponse(raw, res);
+  }
+  return first;
+}
+
+export async function fetchAndGetFirstPlugin({
+  pluginId,
+  channel,
+  product,
+  productVersion,
+}: { pluginId: string; channel?: string; product: string; productVersion: string }) {
+  const first = await _fetchAndGetFirstPlugin(getPluginListUrl({ pluginId, channel }));
+  const [constraintsRemoved, targetVersion] = removeVersionConstraintsIfNecessary(
+    first,
+    productVersion
+  );
+  return await _fetchAndGetFirstPlugin(
+    getPluginListUrl({ pluginId, channel, product, productVersion: targetVersion })
+  );
 }

@@ -1,8 +1,5 @@
-import { configure } from "@zip.js/zip.js";
-import { unstreamText } from "./utils/stream";
-import { getZipTransformStream } from "./utils/zip";
-
-configure({ useCompressionStream: false });
+import { unstreamText } from "../utils/stream";
+import { getZipTransformStream } from "../utils/zip";
 
 const file = Bun.file(Bun.argv[2]!);
 
