@@ -1,8 +1,8 @@
 import S from "semver";
 import { create } from "xmlbuilder2";
 import type { XMLBuilder } from "xmlbuilder2/lib/interfaces";
-import { copyResponse } from "./http";
-import { getPluginListUrl } from "./jetbrains";
+import { copyResponse } from "./http.ts";
+import { getPluginListUrl } from "./jetbrains.ts";
 
 export function exactLatest(doc: XMLBuilder): XMLBuilder | undefined {
   const [plugin] =
@@ -27,7 +27,7 @@ export function removeVersionConstraintsIfNecessary(
   if (!verNode) {
     return [false, version];
   }
-  const node = verNode.node as unknown as Element;
+  const node = verNode.node as any;
   const sv = S.coerce(version, { loose: true })?.version ?? version;
 
   const since = node.getAttribute("since-build");

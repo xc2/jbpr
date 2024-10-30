@@ -1,18 +1,19 @@
+// deno-lint-ignore-file
 import type { Context, Hono } from "hono";
 import { stream } from "hono/streaming";
 import type { XMLBuilder } from "xmlbuilder2/lib/interfaces";
-import { RepositoryPath } from "./paths";
-import { getUsageMessage } from "./utils/cli";
-import { copyHeader } from "./utils/http";
-import { getPluginDownloadUrl, getProductInfo } from "./utils/jetbrains";
+import { RepositoryPath } from "./paths.ts";
+import { getUsageMessage } from "./utils/cli.ts";
+import { copyHeader } from "./utils/http.ts";
+import { getPluginDownloadUrl, getProductInfo } from "./utils/jetbrains.ts";
 import {
   fetchAndGetFirstPlugin,
   getPluginMeta,
   removeVersionConstraintsIfNecessary,
   setDownloadUrl,
-} from "./utils/plugin-xml";
-import { unstreamText } from "./utils/stream";
-import { getZipTransformStream } from "./utils/zip";
+} from "./utils/plugin-xml.ts";
+import { unstreamText } from "./utils/stream.ts";
+import { getZipTransformStream } from "./utils/zip.ts";
 
 export interface RequiredBindings {}
 
@@ -121,7 +122,7 @@ export function registerHandlers(app: Hono<{ Bindings: RequiredBindings }>) {
   });
 }
 
-export function getUsageMessageHandler() {
+export function getUsageMessageHandler(): (c: Context) => Response {
   return (c: Context) => {
     const message = getUsageMessage({ url: new URL(c.req.url) });
     return new Response(message, {

@@ -1,4 +1,4 @@
-import { RepositoryPath } from "../paths";
+import { RepositoryPath } from "../paths.ts";
 
 export function normalizeArgs(_args: unknown, exit: (code: number) => any) {
   const args = _args as any;

@@ -6,21 +6,24 @@
     "dev": "pnpm wrangler dev --port 8686",
     "deploy": "pnpm wrangler deploy --minify"
   },
+  "files": [
+    "sources"
+  ],
   "dependencies": {
+    "@cloudflare/workers-types": "^4.20241022.0",
     "@std/cli": "npm:@jsr/std__cli@^1.0.6",
-    "@types/bun": "^1.1.12",
     "@types/deno": "^2.0.0",
     "@types/lodash-es": "^4.17.12",
     "@types/semver": "^7.5.8",
     "@zip.js/zip.js": "^2.7.52",
+    "bun-types": "^1.1.33",
     "hono": "^4.6.7",
     "lodash-es": "^4.17.21",
     "semver": "^7.6.3",
     "xmlbuilder2": "^3.1.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
-    "@cloudflare/workers-types": "^4.20241022.0"
+    "@biomejs/biome": "^1.9.4"
   },
   "nano-staged": {
     "*.{js,ts,jsx,tsx,css,scss,mjs,cjs,mts,cts}": "biome check --write --diagnostic-level=error --no-errors-on-unmatched"
