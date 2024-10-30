@@ -26,7 +26,11 @@ export function passThrough({
       writableController = controller;
     },
     write(chunk, c) {
-      readableController.enqueue(chunk);
+      try {
+        readableController.enqueue(chunk);
+      } catch (e) {
+        readableController.error(e);
+      }
     },
   });
 

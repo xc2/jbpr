@@ -56,8 +56,8 @@ export function setDownloadUrl(pluginNode: XMLBuilder, url: URL) {
   return ele;
 }
 
-async function _fetchAndGetFirstPlugin(url: URL) {
-  const res = await fetch(url);
+async function _fetchAndGetFirstPlugin(url: URL, signal?: AbortSignal) {
+  const res = await fetch(url, { signal });
   const raw = await res.text();
 
   const doc = create(raw);
@@ -77,13 +77,18 @@ export async function fetchAndGetFirstPlugin({
   channel,
   product,
   productVersion,
-}: { pluginId: string; channel?: string; product: string; productVersion: string }) {
-  const first = await _fetchAndGetFirstPlugin(getPluginListUrl({ pluginId, channel }));
-  const [constraintsRemoved, targetVersion] = removeVersionConstraintsIfNecessary(
-    first,
-    productVersion
-  );
-  return await _fetchAndGetFirstPlugin(
-    getPluginListUrl({ pluginId, channel, product, productVersion: targetVersion })
+  signal,
+}: {
+  pluginId: string;
+  channel?: string;
+  product: string;
+  productVersion: string;
+  signal?: AbortSignal;
+}) {
+  const first = await _fetchAndGetFirstPlugin(getPluginListUrl({ pluginId, channel }), signal);
+  const [_, targetVersion] = removeVersionConstraintsIfNecessary(first, productVersion);
+  return _fetchAndGetFirstPlugin(
+    getPluginListUrl({ pluginId, channel, product, productVersion: targetVersion }),
+    signal
   );
 }

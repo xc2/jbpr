@@ -6,13 +6,9 @@ import {
   ZipWriter,
   type ZipWriterAddDataOptions,
   type ZipWriterConstructorOptions,
-  configure,
 } from "@zip.js/zip.js";
 import { pick } from "lodash-es";
 import { passThrough } from "./stream";
-configure({
-  useWebWorkers: false,
-});
 
 export function getZipTransformStream(
   getTransformer?: (entry: Entry) =>
@@ -24,10 +20,14 @@ export function getZipTransformStream(
     | null
     // biome-ignore lint: a
     | void,
-  options?: {
+  {
+    signal,
+    ...options
+  }: {
+    signal?: AbortSignal;
     reader?: ZipReaderConstructorOptions;
     writer?: ZipWriterConstructorOptions;
-  }
+  } = {}
 ): ReadableWritablePair {
   const sourceStream = new TransformStream();
   const zipFileStream = passThrough({
@@ -62,8 +62,8 @@ export function getZipTransformStream(
       }
     },
   });
-  const reader = new ZipReader(sourceStream.readable, options?.reader);
-  const writer = new ZipWriter(zipFileStream.writable, options?.writer);
+  const reader = new ZipReader(sourceStream.readable, { signal, ...options?.reader });
+  const writer = new ZipWriter(zipFileStream.writable, { signal, ...options?.writer });
 
   return {
     readable: zipFileStream.readable,
@@ -77,7 +77,11 @@ export function readEntry(entry: Entry, options?: EntryGetDataOptions): Readable
       try {
         await entry.getData?.(r.writable, { signal: writableController.signal, ...options });
       } finally {
-        controller.close();
+        try {
+          controller.close();
+        } catch (e) {
+          controller.error(e);
+        }
       }
     },
   });
