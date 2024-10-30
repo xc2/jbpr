@@ -5,9 +5,9 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
     "lib": ["ESNext"],
-    "types": ["@cloudflare/workers-types/2023-07-01", "bun", "deno"],
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
-  }
+    "types": ["@cloudflare/workers-types/2023-07-01", "bun-types", "@types/deno"]
+  },
+  "include": ["bun", "deno", "cloudflare", "sources", "mod.ts"]
 }

@@ -13,12 +13,12 @@ importers:
 
   .:
     dependencies:
+      '@cloudflare/workers-types':
+        specifier: ^4.20241022.0
+        version: 4.20241022.0
       '@std/cli':
         specifier: npm:@jsr/std__cli@^1.0.6
         version: '@jsr/std__cli@1.0.6'
-      '@types/bun':
-        specifier: ^1.1.12
-        version: 1.1.12
       '@types/deno':
         specifier: ^2.0.0
         version: 2.0.0
@@ -31,6 +31,9 @@ importers:
       '@zip.js/zip.js':
         specifier: ^2.7.52
         version: 2.7.52
+      bun-types:
+        specifier: ^1.1.33
+        version: 1.1.33
       hono:
         specifier: ^4.6.7
         version: 4.6.7
@@ -47,9 +50,6 @@ importers:
       '@biomejs/biome':
         specifier: ^1.9.4
         version: 1.9.4
-      '@cloudflare/workers-types':
-        specifier: ^4.20241022.0
-        version: 4.20241022.0
 
 packages:
 
@@ -128,9 +128,6 @@ packages:
     resolution: {integrity: sha512-T8TbSnGsxo6TDBJx/Sgv/BlVJL3tshxZP7Aq5R1mSnM5OcHY2dQaxLMu2+E8u3gN0MLOzdjurqN4ZRVuzQycOQ==}
     engines: {node: '>=8.0'}
 
-  '@types/bun@1.1.12':
-    resolution: {integrity: sha512-UkewJesRDP3+AW30Gc8hvxuIt+vHgYZXmVOKaXV8xnwAnMXTAs3XZDsa/jW+LSdAYhHslokSm72lq63FYYjZqA==}
-
   '@types/deno@2.0.0':
     resolution: {integrity: sha512-O9/jRVlq93kqfkl4sYR5N7+Pz4ukzXVIbMnE/VgvpauNHsvjQ9iBVnJ3X0gAvMa2khcoFD8DSO7mQVCuiuDMPg==}
 
@@ -156,8 +153,8 @@ packages:
   argparse@1.0.10:
     resolution: {integrity: sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg==}
 
-  bun-types@1.1.32:
-    resolution: {integrity: sha512-Lxgux4InO/WRjSAEy3iyDscsnDXR8+3rgNDeZYjPAizFYjUraoNuMl9PuRd9XMgFZgdyQwaUX7/QHmOw5KGFQw==}
+  bun-types@1.1.33:
+    resolution: {integrity: sha512-SOMt3HeI34EyXoAsMxs5qY+e8cjQOn9v1BQl/ZUy1BsOYYuSPBSRVBYE5DjauqY1bOAWGFAjVu9G9pSmCe1bVw==}
 
   esprima@4.0.1:
     resolution: {integrity: sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A==}
@@ -248,10 +245,6 @@ snapshots:
 
   '@oozcitak/util@8.3.8': {}
 
-  '@types/bun@1.1.12':
-    dependencies:
-      bun-types: 1.1.32
-
   '@types/deno@2.0.0': {}
 
   '@types/lodash-es@4.17.12':
@@ -276,7 +269,7 @@ snapshots:
     dependencies:
       sprintf-js: 1.0.3
 
-  bun-types@1.1.32:
+  bun-types@1.1.33:
     dependencies:
       '@types/node': 20.12.14
       '@types/ws': 8.5.12

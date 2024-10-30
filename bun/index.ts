@@ -1,9 +1,11 @@
 #!/usr/bin/env bun
+/// <reference types="npm:bun-types@^1.1.33" />
 import { resolve as resolvePath } from "node:path";
+import process from "node:process";
 import { parseArgs } from "@std/cli/parse-args";
 import { Hono } from "hono";
-import { getUsageMessageHandler, registerHandlers } from "../mod";
-import { getUsageMessage, normalizeArgs } from "../utils/cli";
+import { getUsageMessageHandler, registerHandlers } from "../sources/mod.ts";
+import { getUsageMessage, normalizeArgs } from "../sources/utils/cli.ts";
 
 const { binding } = normalizeArgs(parseArgs(Bun.argv), process.exit);
 

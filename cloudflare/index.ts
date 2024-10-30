@@ -1,11 +1,14 @@
+/// <reference types="npm:@cloudflare/workers-types@^4.20241022.0" />
+import type { Response } from "@cloudflare/workers-types";
 import { configure } from "@zip.js/zip.js";
 import { Hono } from "hono";
-import { getUsageMessageHandler, registerHandlers } from "../mod";
+import { getUsageMessageHandler, registerHandlers } from "../sources/mod.ts";
 
 configure({
   useCompressionStream: false,
   useWebWorkers: false,
 });
+interface CloudflareBindings {}
 
 let app: Hono<{ Bindings: CloudflareBindings }>;
 
@@ -18,7 +21,7 @@ function getApp(env: CloudflareBindings) {
 }
 
 export default {
-  fetch: (request, env, ctx) => {
+  fetch: (request: Request, env: CloudflareBindings, ctx: any): Response | Promise<Response> => {
     return getApp(env).fetch(request, env, ctx);
   },
-} satisfies ExportedHandler<CloudflareBindings>;
+};

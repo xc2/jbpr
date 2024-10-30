@@ -8,7 +8,7 @@ import {
   type ZipWriterConstructorOptions,
 } from "@zip.js/zip.js";
 import { pick } from "lodash-es";
-import { passThrough } from "./stream";
+import { passThrough } from "./stream.ts";
 
 export function getZipTransformStream(
   getTransformer?: (entry: Entry) =>
