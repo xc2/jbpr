@@ -3,7 +3,7 @@
   "scripts": {
     "prepare": "pnpm --package husky@9.1.1 dlx husky",
     "wrangler": "pnpm --package wrangler@3.83.0 dlx wrangler",
-    "dev": "pnpm wrangler dev",
+    "dev": "pnpm wrangler dev --port 8686",
     "deploy": "pnpm wrangler deploy --minify"
   },
   "dependencies": {
