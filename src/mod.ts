@@ -1,4 +1,5 @@
 import type { Context, Hono } from "hono";
+import { stream } from "hono/streaming";
 import type { XMLBuilder } from "xmlbuilder2/lib/interfaces";
 import { RepositoryPath } from "./paths";
 import { getUsageMessage } from "./utils/cli";
@@ -16,19 +17,28 @@ import { getZipTransformStream } from "./utils/zip";
 export interface RequiredBindings {}
 
 export function registerHandlers(app: Hono<{ Bindings: RequiredBindings }>) {
+  app.onError((e) => {
+    if (e?.name === "AbortError") {
+      return new Response(null, { status: 499 });
+    }
+    console.error(e);
+    return new Response("Internal Server Error", { status: 500 });
+  });
+
   app.get(RepositoryPath, async (c) => {
     const { id: pluginId } = c.req.param();
     const { build, channel } = c.req.query();
     if (!pluginId) {
       return new Response("pluginId is required", { status: 400 });
     }
+    const { signal } = c.req.raw;
     const [product, productVersion] = getProductInfo(build);
     if (!product || !productVersion) {
       return new Response("build is required", { status: 400 });
     }
     let first: XMLBuilder | null = null;
     try {
-      first = await fetchAndGetFirstPlugin({ pluginId, channel, product, productVersion });
+      first = await fetchAndGetFirstPlugin({ pluginId, channel, product, productVersion, signal });
     } catch (e) {
       if (e instanceof Response) {
         return e;
@@ -66,7 +76,8 @@ export function registerHandlers(app: Hono<{ Bindings: RequiredBindings }>) {
   app.get("/plugin/download", async (c) => {
     const { pluginId, version, channel } = c.req.query();
     const u = getPluginDownloadUrl({ pluginId, version, channel });
-    const res = await fetch(u, { redirect: "follow" });
+    const { signal } = c.req.raw;
+    const res = await fetch(u, { redirect: "follow", signal });
     const headers = res.headers;
     if (!(headers.get("content-type") || "").includes("/zip")) {
       return res;
@@ -74,9 +85,8 @@ export function registerHandlers(app: Hono<{ Bindings: RequiredBindings }>) {
     if (!res.body) {
       return res;
     }
-    const h = new Headers({
-      "content-type": "application/zip",
-    });
+    const h = c.res.headers;
+    h.set("content-type", "application/zip");
     copyHeader(headers, h, "etag");
     copyHeader(headers, h, "age");
     copyHeader(headers, h, "vary");
@@ -91,25 +101,23 @@ export function registerHandlers(app: Hono<{ Bindings: RequiredBindings }>) {
       return new Response(null, { status: 304, headers: h });
     }
 
-    const zipTrans = getZipTransformStream((entry) => {
-      if (entry.filename.endsWith(".jar")) {
-        return getZipTransformStream((entry) => {
-          if (entry.filename === "META-INF/plugin.xml") {
-            return unstreamText((text) => {
-              text = text.replace(/ until-build="[^"]+"/, "");
-              return text;
-            });
-          }
-        });
-      }
+    const body = res.body;
+    return stream(c, async (api) => {
+      const zipTrans = getZipTransformStream((entry) => {
+        if (entry.filename.endsWith(".jar")) {
+          return getZipTransformStream((entry) => {
+            if (entry.filename === "META-INF/plugin.xml") {
+              return unstreamText((text) => {
+                text = text.replace(/ until-build="[^"]+"/, "");
+                return text;
+              });
+            }
+          });
+        }
+      });
+
+      await api.pipe(body.pipeThrough(zipTrans));
     });
-    const es = new TransformStream();
-    const r = res.body.pipeThrough(zipTrans).pipeTo(es.writable);
-    const fin = new Response(es.readable, { headers: h });
-    try {
-      c.executionCtx.waitUntil(r);
-    } catch {}
-    return fin;
   });
 }
 
