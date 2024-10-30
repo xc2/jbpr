@@ -113,14 +113,9 @@ export function registerHandlers(app: Hono<{ Bindings: RequiredBindings }>) {
   });
 }
 
-export function getUsageMessageHandler({
-  hostname,
-  port,
-  ...rest
-}: Parameters<typeof getUsageMessage>[0]) {
+export function getUsageMessageHandler() {
   return (c: Context) => {
-    const u = new URL(c.req.url);
-    const message = getUsageMessage({ ...rest, origin: u.origin });
+    const message = getUsageMessage({ url: new URL(c.req.url) });
     return new Response(message, {
       headers: { "content-type": "text/plain;charset=utf-8" },
     });

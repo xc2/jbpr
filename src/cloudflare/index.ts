@@ -1,6 +1,6 @@
 import { configure } from "@zip.js/zip.js";
 import { Hono } from "hono";
-import { registerHandlers } from "../mod";
+import { getUsageMessageHandler, registerHandlers } from "../mod";
 
 configure({
   useCompressionStream: false,
@@ -13,6 +13,7 @@ function getApp(env: CloudflareBindings) {
   if (app) return app;
   app = new Hono<{ Bindings: CloudflareBindings }>();
   registerHandlers(app);
+  app.get("/", getUsageMessageHandler());
   return app;
 }
 
