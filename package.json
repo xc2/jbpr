@@ -1,6 +1,4 @@
 {
-  "name": "jbpr",
-  "version": "0.0.0-PLACEHOLDER",
   "type": "module",
   "scripts": {
     "prepare": "pnpm --package husky@9.1.1 dlx husky",
@@ -8,19 +6,7 @@
     "dev": "pnpm wrangler dev --port 8686",
     "deploy": "pnpm wrangler deploy --minify"
   },
-  "main": "dist/mod.cjs",
-  "module": "dist/mod.js",
-  "exports": {
-    ".": {
-      "import": "./dist/mod.js",
-      "require": "./dist/mod.cjs",
-      "default": "./dist/mod.js",
-      "types": "./dist/mod.d.ts"
-    },
-    "./dist/*": "./dist/*",
-    "./*": "./dist/*"
-  },
-  "files": ["dist"],
+  "license": "MIT",
   "dependencies": {
     "@types/lodash-es": "^4.17.12",
     "@types/semver": "^7.5.8",
@@ -38,6 +24,7 @@
     "@std/cli": "npm:@jsr/std__cli@^1.0.6",
     "@types/deno": "^2.0.0",
     "bun-types": "^1.1.33",
+    "type-fest": "^4.26.1",
     "typescript": "^5.6.3"
   },
   "sideEffects": ["runtimes/**", "binary/**"],

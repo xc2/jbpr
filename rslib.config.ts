@@ -1,128 +1,137 @@
-import { defineConfig } from "@rslib/core";
+import { type LibConfig, defineConfig } from "@rslib/core";
+import { defaults, defaultsDeep, pick } from "lodash-es";
+import type { PackageJson } from "type-fest";
+type Target = "lib" | "bin";
 
-export default defineConfig({
-  output: { cleanDistPath: true, target: "node" },
-  lib: [
+const TypeMagic = [] as LibConfig[];
+
+const NamedConfig: Record<Target, LibConfig | LibConfig[]> = {
+  // MARK: lib
+  lib: TypeMagic.concat([
     {
-      bundle: false,
       format: "esm",
-      syntax: "es2021",
       dts: {},
-      source: {
-        entry: {
-          main: ["sources/**"],
-        },
-      },
-    },
-    {
-      bundle: false,
-      format: "cjs",
-      syntax: "es2021",
-      dts: false,
-      source: {
-        entry: {
-          main: ["sources/**"],
-        },
-      },
-    },
-    {
-      format: "esm",
-      syntax: "es2021",
-      dts: false,
-      autoExternal: false,
-      autoExtension: false,
-
-      source: {
-        entry: {
-          bun: getInput({ import: "./runtimes/bun/index.ts" }),
-          node: getInput({ import: "./runtimes/node/index.ts" }),
-          deno: getInput({ import: "./runtimes/deno/index.ts" }),
-        },
-      },
-      tools: {
-        rspack: [
+      output: {
+        copy: [
           {
-            plugins: [
-              {
-                apply(compiler) {
-                  new compiler.webpack.BannerPlugin({
-                    entryOnly: true,
-                    raw: true,
-                    banner: ({ filename }) => {
-                      switch (filename) {
-                        case "deno.mjs":
-                          return "#!/usr/bin/env deno run --allow-net --unstable-sloppy-imports --allow-read --allow-write";
-                        case "bun.mjs":
-                          return "#!/usr/bin/env bun";
-                        case "node.mjs":
-                          return "#!/usr/bin/env node";
-                      }
-                      return "";
-                    },
-                  }).apply(compiler);
-                  compiler.hooks.assetEmitted.tap("a", async (filename, info) => {
-                    if (/(deno|bun|node)\.[cm]?js/.test(filename)) {
-                      const { chmod } = await import("node:fs/promises");
-                      await chmod(info.targetPath, 0o755);
+            from: "sources/manifest.json",
+            to: "package.json",
+            transform: (v) =>
+              transformPackageJson(v, (f, t) => {
+                return defaults(t, pick(f, ["dependencies"]));
+              }),
+          },
+          { from: "sources/README.md" },
+        ],
+      },
+    },
+    { format: "cjs", dts: false },
+  ]).map((v) => {
+    return defaultsDeep(v, {
+      bundle: false,
+      syntax: "es2021",
+      source: {
+        entry: {
+          main: ["sources/**/*.ts"],
+        },
+      },
+      output: {
+        sourceMap: { js: "source-map" },
+      },
+    });
+  }),
+  // MARK: binary
+  bin: {
+    format: "esm",
+    syntax: "es2021",
+    dts: false,
+    autoExternal: false,
+    autoExtension: false,
+
+    source: {
+      entry: {
+        bun: getInput({ import: "./runtimes/bun/index.ts" }),
+        node: getInput({ import: "./runtimes/node/index.ts" }),
+        deno: getInput({ import: "./runtimes/deno/index.ts" }),
+        index: "./binary/index.ts",
+      },
+    },
+
+    output: {
+      copy: [
+        {
+          from: "binary/manifest.json",
+          to: "package.json",
+          transform: (v) => transformPackageJson(v),
+        },
+        { from: "README.md" },
+      ],
+      externals: {
+        url: "node:url",
+        buffer: "node:buffer",
+        events: "node:events",
+      },
+      minify: true,
+      distPath: {
+        jsAsync: "internal",
+      },
+      filename: {
+        js: "[name].mjs",
+      },
+    },
+    tools: {
+      rspack: [
+        {
+          plugins: [
+            {
+              apply(compiler) {
+                new compiler.webpack.BannerPlugin({
+                  entryOnly: true,
+                  raw: true,
+                  banner: ({ filename }) => {
+                    switch (filename) {
+                      case "deno.mjs":
+                        return "#!/usr/bin/env deno run --allow-net --unstable-sloppy-imports --allow-read --allow-write";
+                      case "bun.mjs":
+                        return "#!/usr/bin/env bun";
+                      case "node.mjs":
+                        return "#!/usr/bin/env node";
                     }
-                  });
-                },
-              },
-            ],
-            optimization: {
-              splitChunks: {
-                cacheGroups: {
-                  sources: {
-                    test: /(sources|node_modules)/,
-                    name: "sources",
-                    chunks: "all",
-                    filename: "internal/[name].mjs",
-                    minSize: 0,
-                    reuseExistingChunk: true,
+                    return "";
                   },
+                }).apply(compiler);
+                compiler.hooks.assetEmitted.tap("a", async (filename, info) => {
+                  if (/(deno|bun|node)\.[cm]?js/.test(filename)) {
+                    const { chmod } = await import("node:fs/promises");
+                    await chmod(info.targetPath, 0o755);
+                  }
+                });
+              },
+            },
+          ],
+          optimization: {
+            splitChunks: {
+              cacheGroups: {
+                sources: {
+                  test: /(sources|node_modules)/,
+                  name: "sources",
+                  chunks: /(node|bun|deno)/,
+                  filename: "internal/[name].mjs",
+                  minSize: 0,
+                  reuseExistingChunk: true,
                 },
               },
             },
           },
-        ],
-      },
-      output: {
-        externals: {
-          url: "node:url",
-          buffer: "node:buffer",
-          events: "node:events",
         },
-        minify: false,
-        distPath: {
-          root: "releases/binary",
-          jsAsync: "internal",
-        },
-        filename: {
-          js: "[name].mjs",
-        },
-      },
+      ],
     },
-    {
-      format: "esm",
-      syntax: "es2021",
-      autoExternal: false,
-      autoExtension: false,
-      source: {
-        entry: {
-          index: "./binary/index.ts",
-        },
-      },
-      output: {
-        copy: [{ from: "binary/manifest.json", to: "package.json" }],
-        distPath: {
-          root: "releases/binary",
-        },
-        filename: {
-          js: "[name].mjs",
-        },
-      },
-    },
-  ],
+  },
+};
+
+export default defineConfig({
+  output: { cleanDistPath: true, target: "node" },
+  lib: namedConfigToArray(NamedConfig),
 });
 
 function getInput(options: { import: string; banner?: string; chunkName?: string }) {
@@ -134,4 +143,45 @@ import(${chunkNameComment}${JSON.stringify(options.import)})
 `;
 
   return `data:text/typescript;base64,${Buffer.from(code, "utf8").toString("base64")}`;
+}
+
+async function transformPackageJson(
+  input: Buffer,
+  transform?: (project: PackageJson, thisPkg: PackageJson) => PackageJson | Promise<PackageJson>
+) {
+  const projectPkg = (await import("./package.json")) as PackageJson;
+
+  const thisPkg = JSON.parse(input.toString("utf8")) as PackageJson;
+  const copyFields = [
+    "version",
+    "author",
+    "repository",
+    "license",
+    "homepage",
+    "bugs",
+    "contributors",
+    "funding",
+  ];
+  defaults(thisPkg, pick(projectPkg, copyFields));
+
+  await transform?.(projectPkg, thisPkg);
+  return JSON.stringify(thisPkg, null, 2);
+}
+
+function namedConfigToArray(dict: Record<string, LibConfig | LibConfig[]>) {
+  const lib: LibConfig[] = [];
+  for (let [target, configs] of Object.entries(dict)) {
+    configs = Array.isArray(configs) ? configs : [configs];
+    for (let config of configs) {
+      const c = defaultsDeep(config, {
+        output: {
+          distPath: {
+            root: `dist/${target}`,
+          },
+        },
+      });
+      lib.push(c);
+    }
+  }
+  return lib;
 }
