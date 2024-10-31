@@ -2,8 +2,8 @@
 import { resolve as resolvePath } from "node:path";
 import { parseArgs } from "@std/cli/parse-args";
 import { Hono } from "hono";
-import { getUsageMessageHandler, registerHandlers } from "../sources/mod.ts";
-import { getUsageMessage, normalizeArgs } from "../sources/utils/cli.ts";
+import { getUsageMessageHandler, registerHandlers } from "../../sources/mod.ts";
+import { getUsageMessage, normalizeArgs } from "../../sources/utils/cli.ts";
 
 const { binding } = normalizeArgs(parseArgs(Deno.args), Deno.exit);
 
