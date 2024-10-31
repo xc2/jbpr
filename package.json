@@ -40,7 +40,7 @@
     "bun-types": "^1.1.33",
     "typescript": "^5.6.3"
   },
-  "sideEffects": ["bun/**", "node/**", "deno/**", "binary/**"],
+  "sideEffects": ["runtimes/**", "binary/**"],
   "nano-staged": {
     "*.{js,ts,jsx,tsx,css,scss,mjs,cjs,mts,cts}": "biome check --write --diagnostic-level=error --no-errors-on-unmatched"
   },
