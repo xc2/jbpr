@@ -1,30 +1,46 @@
 {
-  "name": "jbp-proxy",
+  "name": "jbpr",
+  "version": "0.0.0-PLACEHOLDER",
+  "type": "module",
   "scripts": {
     "prepare": "pnpm --package husky@9.1.1 dlx husky",
     "wrangler": "pnpm --package wrangler@3.83.0 dlx wrangler",
     "dev": "pnpm wrangler dev --port 8686",
     "deploy": "pnpm wrangler deploy --minify"
   },
-  "files": [
-    "sources"
-  ],
+  "main": "dist/mod.cjs",
+  "module": "dist/mod.js",
+  "exports": {
+    ".": {
+      "import": "./dist/mod.js",
+      "require": "./dist/mod.cjs",
+      "default": "./dist/mod.js",
+      "types": "./dist/mod.d.ts"
+    },
+    "./dist/*": "./dist/*",
+    "./*": "./dist/*"
+  },
+  "files": ["dist"],
   "dependencies": {
-    "@cloudflare/workers-types": "^4.20241022.0",
-    "@std/cli": "npm:@jsr/std__cli@^1.0.6",
-    "@types/deno": "^2.0.0",
     "@types/lodash-es": "^4.17.12",
     "@types/semver": "^7.5.8",
     "@zip.js/zip.js": "^2.7.52",
-    "bun-types": "^1.1.33",
     "hono": "^4.6.7",
     "lodash-es": "^4.17.21",
     "semver": "^7.6.3",
     "xmlbuilder2": "^3.1.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4"
+    "@biomejs/biome": "^1.9.4",
+    "@cloudflare/workers-types": "^4.20241022.0",
+    "@hono/node-server": "^1.13.4",
+    "@rslib/core": "^0.0.15",
+    "@std/cli": "npm:@jsr/std__cli@^1.0.6",
+    "@types/deno": "^2.0.0",
+    "bun-types": "^1.1.33",
+    "typescript": "^5.6.3"
   },
+  "sideEffects": ["bun/**", "node/**", "deno/**", "binary/**"],
   "nano-staged": {
     "*.{js,ts,jsx,tsx,css,scss,mjs,cjs,mts,cts}": "biome check --write --diagnostic-level=error --no-errors-on-unmatched"
   },

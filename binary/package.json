@@ -1,0 +1,9 @@
+{
+  "name": "jbpr",
+  "version": "0.0.0-PLACEHOLDER",
+  "type": "commonjs",
+  "description": "The CLI package for jbpr",
+  "bin": {
+    "jbpr": "./index.js"
+  }
+}
