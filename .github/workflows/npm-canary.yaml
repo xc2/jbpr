@@ -22,14 +22,14 @@ jobs:
     uses: xc2/ghwf/.github/workflows/pnpm-artifact.yaml@main
     with:
       script: 'ci:pack'
-      artifact-path: "*.tgz"
+      artifact-path: "dist/*/*.tgz"
       artifact-name: pkg
 
   publish:
     runs-on: ubuntu-latest
     environment: npm-canary
     needs: build
-    name: Publish ${{ matrix.name }}
+    name: Publish ${{ matrix.pkg.name }}
     strategy:
       matrix:
         pkg:
@@ -44,10 +44,10 @@ jobs:
         with:
           cache-key: ${{ needs.build.outputs.cache-key }}
           cache-path: ${{ needs.build.outputs.cache-path }}
-      - uses: 109cafe/action-npr@main
+      - uses: 109cafe/action-npr@web-stream
         with:
           version: ${{ inputs.version }}
-          name: ${{ matrix.lib-name }}
-          tarball: ${{ matrix.tarball }}
+          name: ${{ matrix.pkg.name }}
+          tarball: ${{ matrix.pkg.tarball }}
           token: ${{ secrets.NPM_TOKEN }}
           provenance: true

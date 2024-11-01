@@ -73,6 +73,7 @@ const NamedConfig: Record<Target, LibConfig | LibConfig[]> = {
         events: "node:events",
       },
       minify: true,
+      sourceMap: { js: "source-map" },
       distPath: {
         jsAsync: "internal",
       },
