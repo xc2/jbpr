@@ -1,0 +1,53 @@
+name: NPM Canary Publish
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Package version'
+        required: false
+        type: string
+      lib-name:
+        description: 'Library Package name'
+        required: false
+        type: string
+        default: '@canary-109cafe/jbpr'
+      bin-name:
+        description: 'Binary Package name'
+        required: false
+        type: string
+        default: '@canary-109cafe/jbpr-bin'
+
+jobs:
+  build:
+    uses: xc2/ghwf/.github/workflows/pnpm-artifact.yaml@main
+    with:
+      script: 'ci:pack'
+      artifact-path: "*.tgz"
+      artifact-name: pkg
+
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm-canary
+    needs: build
+    name: Publish ${{ matrix.name }}
+    strategy:
+      matrix:
+        pkg:
+          - name: ${{ inputs.lib-name }}
+            tarball: "dist/lib/*.tgz"
+          - name: ${{ inputs.bin-name }}
+            tarball: "dist/bin/*.tgz"
+    permissions:
+      id-token: write
+    steps:
+      - uses: xc2/ghwf/pnpm-artifact/restore@main
+        with:
+          cache-key: ${{ needs.build.outputs.cache-key }}
+          cache-path: ${{ needs.build.outputs.cache-path }}
+      - uses: 109cafe/action-npr@main
+        with:
+          version: ${{ inputs.version }}
+          name: ${{ matrix.lib-name }}
+          tarball: ${{ matrix.tarball }}
+          token: ${{ secrets.NPM_TOKEN }}
+          provenance: true

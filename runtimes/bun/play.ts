@@ -1,5 +1,5 @@
-import { unstreamText } from "./sources/utils/stream.ts";
-import { getZipTransformStream } from "./sources/utils/zip.ts";
+import { unstreamText } from "../../sources/utils/stream.ts";
+import { getZipTransformStream } from "../../sources/utils/zip.ts";
 
 const file = Bun.file(Bun.argv[2]!);
 

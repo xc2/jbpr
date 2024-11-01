@@ -4,8 +4,10 @@
     "prepare": "pnpm --package husky@9.1.1 dlx husky",
     "wrangler": "pnpm --package wrangler@3.83.0 dlx wrangler",
     "dev": "pnpm wrangler dev --port 8686",
-    "deploy": "pnpm wrangler deploy --minify"
+    "lib": "pnpm rslib build",
+    "ci:pack": "pnpm run lib && npm pack ./dist/bin --pack-destination ./dist/bin && npm pack ./dist/lib --pack-destination ./dist/lib"
   },
+  "repository": "https://github.com/xc2/jbpr",
   "license": "MIT",
   "dependencies": {
     "@types/lodash-es": "^4.17.12",
