@@ -5,6 +5,7 @@ type Target = "lib" | "bin";
 
 const TypeMagic = [] as LibConfig[];
 
+// TODO: we can build a target filter then
 const NamedConfig: Record<Target, LibConfig | LibConfig[]> = {
   // MARK: lib
   lib: TypeMagic.concat([
