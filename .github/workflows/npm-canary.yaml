@@ -44,7 +44,7 @@ jobs:
         with:
           cache-key: ${{ needs.build.outputs.cache-key }}
           cache-path: ${{ needs.build.outputs.cache-path }}
-      - uses: 109cafe/action-npr@version-fix
+      - uses: 109cafe/action-npr@main
         with:
           version: ${{ inputs.version }}
           name: ${{ matrix.pkg.name }}
