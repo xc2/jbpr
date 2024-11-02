@@ -10,12 +10,12 @@ on:
         description: 'Library Package name'
         required: false
         type: string
-        default: '@canary-109cafe/jbpr'
+        default: '@canary-109cafe/jbpr-lib'
       bin-name:
         description: 'Binary Package name'
         required: false
         type: string
-        default: '@canary-109cafe/jbpr-bin'
+        default: '@canary-109cafe/jbpr'
 
 jobs:
   build:
@@ -44,7 +44,7 @@ jobs:
         with:
           cache-key: ${{ needs.build.outputs.cache-key }}
           cache-path: ${{ needs.build.outputs.cache-path }}
-      - uses: 109cafe/action-npr@web-stream
+      - uses: 109cafe/action-npr@version-fix
         with:
           version: ${{ inputs.version }}
           name: ${{ matrix.pkg.name }}
