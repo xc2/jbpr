@@ -98,6 +98,9 @@ const NamedConfig: Record<Target, LibConfig | LibConfig[]> = {
                         return "#!/usr/bin/env bun";
                       case "node.mjs":
                         return "#!/usr/bin/env node";
+                      case "index.mjs":
+                        // is required by npx
+                        return "#!/usr/bin/env node";
                     }
                     return "";
                   },

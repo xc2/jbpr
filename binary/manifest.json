@@ -3,7 +3,5 @@
   "version": "0.0.0-PLACEHOLDER",
   "type": "module",
   "description": "The CLI package for jbpr",
-  "bin": {
-    "jbpr": "./index.mjs"
-  }
+  "bin": "./index.mjs"
 }
