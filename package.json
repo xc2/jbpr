@@ -7,7 +7,6 @@
     "lib": "pnpm rslib build",
     "ci:pack": "pnpm run lib && npm pack ./dist/bin --pack-destination ./dist/bin && npm pack ./dist/lib --pack-destination ./dist/lib"
   },
-  "repository": "https://github.com/xc2/jbpr",
   "license": "MIT",
   "dependencies": {
     "@types/lodash-es": "^4.17.12",

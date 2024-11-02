@@ -10,26 +10,26 @@ on:
         description: 'Library Package name'
         required: false
         type: string
-        default: '@canary-109cafe/jbpr'
+        default: '@canary-109cafe/jbpr-lib'
       bin-name:
         description: 'Binary Package name'
         required: false
         type: string
-        default: '@canary-109cafe/jbpr-bin'
+        default: '@canary-109cafe/jbpr'
 
 jobs:
   build:
     uses: xc2/ghwf/.github/workflows/pnpm-artifact.yaml@main
     with:
       script: 'ci:pack'
-      artifact-path: "*.tgz"
+      artifact-path: "dist/*/*.tgz"
       artifact-name: pkg
 
   publish:
     runs-on: ubuntu-latest
     environment: npm-canary
     needs: build
-    name: Publish ${{ matrix.name }}
+    name: Publish ${{ matrix.pkg.name }}
     strategy:
       matrix:
         pkg:
@@ -47,7 +47,7 @@ jobs:
       - uses: 109cafe/action-npr@main
         with:
           version: ${{ inputs.version }}
-          name: ${{ matrix.lib-name }}
-          tarball: ${{ matrix.tarball }}
+          name: ${{ matrix.pkg.name }}
+          tarball: ${{ matrix.pkg.tarball }}
           token: ${{ secrets.NPM_TOKEN }}
           provenance: true

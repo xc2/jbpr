@@ -65,7 +65,7 @@ const NamedConfig: Record<Target, LibConfig | LibConfig[]> = {
           to: "package.json",
           transform: (v) => transformPackageJson(v),
         },
-        { from: "README.md" },
+        { from: "binary/README.md" },
       ],
       externals: {
         url: "node:url",
@@ -73,6 +73,7 @@ const NamedConfig: Record<Target, LibConfig | LibConfig[]> = {
         events: "node:events",
       },
       minify: true,
+      sourceMap: { js: "source-map" },
       distPath: {
         jsAsync: "internal",
       },
@@ -96,6 +97,9 @@ const NamedConfig: Record<Target, LibConfig | LibConfig[]> = {
                       case "bun.mjs":
                         return "#!/usr/bin/env bun";
                       case "node.mjs":
+                        return "#!/usr/bin/env node";
+                      case "index.mjs":
+                        // is required by npx
                         return "#!/usr/bin/env node";
                     }
                     return "";
