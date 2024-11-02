@@ -61,3 +61,7 @@ http://127.0.0.1:8686/plugins/7083
 Now you are able to install the plugin of id `7083` (Erlang) in the IDE plugin marketplace.
 
 ![image](https://github.com/user-attachments/assets/15403fb5-b1c2-48a1-9ea9-20a20cc44fff)
+
+## License
+
+[MIT ©️ xc2](https://tldr.ws/mitxc2)

@@ -65,7 +65,7 @@ const NamedConfig: Record<Target, LibConfig | LibConfig[]> = {
           to: "package.json",
           transform: (v) => transformPackageJson(v),
         },
-        { from: "README.md" },
+        { from: "binary/README.md" },
       ],
       externals: {
         url: "node:url",
