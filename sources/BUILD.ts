@@ -3,8 +3,18 @@ import { type NamedLibConfig, transformPackageJson } from "../BUILD.helpers.ts";
 
 export const targets = (
   [
-    { name: "esm", format: "esm" },
-    { name: "cjs", format: "cjs" },
+    {
+      name: "esm",
+      format: "esm",
+      autoExtension: false,
+      output: { filename: { js: "[name].mjs" } },
+    },
+    {
+      name: "cjs",
+      format: "cjs",
+      autoExtension: false,
+      output: { filename: { js: "[name].cjs" } },
+    },
   ] as NamedLibConfig[]
 )
   .map<NamedLibConfig>((v) => {
