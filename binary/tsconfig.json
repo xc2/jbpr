@@ -9,5 +9,6 @@
     "allowImportingTsExtensions": true,
     "lib": ["ESNext"],
     "types": ["bun-types", "node", "deno"]
-  }
+  },
+  "exclude": ["BUILD.*"]
 }
