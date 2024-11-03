@@ -9,5 +9,6 @@
     "allowImportingTsExtensions": true,
     "lib": ["ESNext", "WebWorker"]
   },
-  "include": ["sources"]
+  "include": ["sources"],
+  "exclude": ["**/BUILD.*"]
 }

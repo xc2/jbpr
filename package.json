@@ -25,10 +25,14 @@
     "@std/cli": "npm:@jsr/std__cli@^1.0.6",
     "@types/deno": "^2.0.0",
     "bun-types": "^1.1.33",
+    "glob": "^11.0.0",
     "type-fest": "^4.26.1",
     "typescript": "^5.6.3"
   },
-  "sideEffects": ["runtimes/**", "binary/**"],
+  "sideEffects": [
+    "runtimes/**",
+    "binary/**"
+  ],
   "nano-staged": {
     "*.{js,ts,jsx,tsx,css,scss,mjs,cjs,mts,cts}": "biome check --write --diagnostic-level=error --no-errors-on-unmatched"
   },
