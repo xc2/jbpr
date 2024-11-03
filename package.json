@@ -4,8 +4,7 @@
     "prepare": "pnpm --package husky@9.1.1 dlx husky",
     "wrangler": "pnpm --package wrangler@3.83.0 dlx wrangler",
     "dev": "pnpm wrangler dev --port 8686",
-    "lib": "pnpm rslib build",
-    "ci:pack": "pnpm run lib && npm pack ./dist/bin --pack-destination ./dist/bin && npm pack ./dist/lib --pack-destination ./dist/lib"
+    "ci:pack": "pnpm rslib build && npm pack ./dist/bin --pack-destination ./dist/bin && npm pack ./dist/lib --pack-destination ./dist/lib"
   },
   "license": "MIT",
   "dependencies": {
@@ -29,10 +28,7 @@
     "type-fest": "^4.26.1",
     "typescript": "^5.6.3"
   },
-  "sideEffects": [
-    "runtimes/**",
-    "binary/**"
-  ],
+  "sideEffects": ["runtimes/**", "binary/**"],
   "nano-staged": {
     "*.{js,ts,jsx,tsx,css,scss,mjs,cjs,mts,cts}": "biome check --write --diagnostic-level=error --no-errors-on-unmatched"
   },

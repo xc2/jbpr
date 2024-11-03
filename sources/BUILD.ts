@@ -3,11 +3,39 @@ import { type NamedLibConfig, transformPackageJson } from "../BUILD.helpers.ts";
 
 export const targets = (
   [
-    {
-      name: "esm",
-      format: "esm",
-      dts: { bundle: false },
+    { name: "esm", format: "esm" },
+    { name: "cjs", format: "cjs" },
+  ] as NamedLibConfig[]
+)
+  .map<NamedLibConfig>((v) => {
+    return defaultsDeep(v, {
+      bundle: false,
+      syntax: "es2021",
+      dts: false,
+      source: {
+        entry: {
+          main: ["sources/**/*.ts", "!**/BUILD.ts"],
+        },
+      },
       output: {
+        distPath: { root: "dist/lib" },
+        sourceMap: { js: "source-map" },
+      },
+    });
+  })
+  .concat([
+    {
+      name: "pkg",
+      format: "esm",
+      syntax: "es2021",
+      dts: { bundle: false },
+      source: {
+        entry: {
+          main: [],
+        },
+      },
+      output: {
+        distPath: { root: "dist/lib" },
         copy: [
           {
             from: "sources/manifest.json",
@@ -21,21 +49,4 @@ export const targets = (
         ],
       },
     },
-    { name: "cjs", format: "cjs", dts: false },
-  ] as NamedLibConfig[]
-).map<NamedLibConfig>((v) => {
-  return defaultsDeep(v, {
-    target: "node",
-    bundle: false,
-    syntax: "es2021",
-    source: {
-      entry: {
-        main: ["sources/**/*.ts", "!**/BUILD.ts"],
-      },
-    },
-    output: {
-      distPath: { root: "dist/lib" },
-      sourceMap: { js: "source-map" },
-    },
-  });
-});
+  ]);

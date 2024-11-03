@@ -19,14 +19,6 @@ export const targets = [
     },
 
     output: {
-      copy: [
-        {
-          from: "binary/manifest.json",
-          to: "package.json",
-          transform: (v) => transformPackageJson(v),
-        },
-        { from: "binary/README.md" },
-      ],
       externals: {
         url: "node:url",
         buffer: "node:buffer",
@@ -93,6 +85,27 @@ export const targets = [
             },
           },
         },
+      ],
+    },
+  },
+  {
+    name: "pkg",
+    format: "esm",
+    dts: false,
+    source: {
+      entry: {
+        main: [],
+      },
+    },
+    output: {
+      distPath: { root: "dist/bin" },
+      copy: [
+        {
+          from: "binary/manifest.json",
+          to: "package.json",
+          transform: (v) => transformPackageJson(v),
+        },
+        { from: "binary/README.md" },
       ],
     },
   },
