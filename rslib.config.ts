@@ -1,11 +1,18 @@
 import { type LibConfig, defineConfig } from "@rslib/core";
-import { defaults, defaultsDeep, pick } from "lodash-es";
+import { parseArgs } from "@std/cli/parse-args";
+import { defaults, defaultsDeep, pick, pickBy } from "lodash-es";
 import type { PackageJson } from "type-fest";
 type Target = "lib" | "bin";
 
 const TypeMagic = [] as LibConfig[];
+const argv = parseArgs(process.argv, {
+  "--": true,
+})["--"];
 
-// TODO: we can build a target filter then
+const args = parseArgs(argv, {
+  collect: ["only", "except"],
+});
+
 const NamedConfig: Record<Target, LibConfig | LibConfig[]> = {
   // MARK: lib
   lib: TypeMagic.concat([
@@ -136,8 +143,10 @@ const NamedConfig: Record<Target, LibConfig | LibConfig[]> = {
 
 export default defineConfig({
   output: { cleanDistPath: true, target: "node" },
-  lib: namedConfigToArray(NamedConfig),
+  lib: namedConfigToArray(pickBy(NamedConfig, getTargetFilter(args))),
 });
+
+// MARK: Helpers
 
 function getInput(options: { import: string; banner?: string; chunkName?: string }) {
   const chunkNameComment = options.chunkName
@@ -189,4 +198,19 @@ function namedConfigToArray(dict: Record<string, LibConfig | LibConfig[]>) {
     }
   }
   return lib;
+}
+
+function getTargetFilter(options: { only?: string[]; except?: string[] }) {
+  const only = new Set(options.only);
+  const except = new Set(options.except);
+  if (only.size && except.size) {
+    throw new Error('Cannot use both "--only" and "--except"');
+  }
+  if (only.size) {
+    return (v: any, k: string) => only.has(k);
+  }
+  if (except.size) {
+    return (v: any, k: string) => !except.has(k);
+  }
+  return (v: any, k: string) => true;
 }
